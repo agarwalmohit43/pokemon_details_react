@@ -2,9 +2,10 @@ import { useCallback, useEffect, useReducer, useState } from "react";
 import PokemonListCard from "./PokemonListCard";
 import { getPokemonsWithNext } from "../js/pokemon";
 import { FETCH_NEW_POKEMON, FETCHING, CONTENT } from "../js/Constant";
-// import { pokemonReducer } from "../js/reducers";
+import pokemonReducer from "../js/reducers";
 
 import "../style/pokemon.scss";
+import "../style/loader.scss";
 
 const initialData = {
   fetching: true,
@@ -17,28 +18,20 @@ const initialData = {
 };
 
 const PokemonLists = () => {
-  const pokemonReducer = (state, action) => {
-    switch (action.type) {
-      case FETCH_NEW_POKEMON:
-        return { ...state, offset: state.offset + 20, fetching: true };
-      case FETCHING:
-        return { ...state, fetching: true };
-      case CONTENT:
-        return {
-          ...state,
-          content: state.content.concat(action.payload.data),
-          fetching: false,
-          next: action.payload.next
-        };
-      default:
-        return state;
-    }
-  };
   const [pokemon, dispatch] = useReducer(pokemonReducer, initialData);
 
   useEffect(() => {
-    if (pokemon.next) {
-      getPokemonsWithNext(pokemon.next)
+    fetchAndUpdate(pokemon.next);
+  }, [pokemon.next]);
+
+  useEffect(() => {
+    observeNewCard();
+  }, [pokemon.content]);
+
+  const fetchAndUpdate = (next) => {
+    if (next) {
+      dispatch({ type: FETCHING });
+      getPokemonsWithNext(next)
         .then((res) => {
           console.log(res);
           dispatch({
@@ -51,11 +44,7 @@ const PokemonLists = () => {
         })
         .catch(console.log);
     }
-  }, [pokemon.next]);
-
-  useEffect(() => {
-    observeNewCard();
-  }, [pokemon.content]);
+  };
 
   const observeNewCard = () => {
     const cards = document.querySelectorAll(".card");
@@ -76,32 +65,42 @@ const PokemonLists = () => {
     cards.forEach((card) => {
       observer.observe(card);
     });
+
+    //lazy-loading
+    const lastCardObserver = new IntersectionObserver(
+      (entries) => {
+        const lastCard = entries[0];
+        if (!lastCard.isIntersecting) return;
+        fetchAndUpdate(pokemon.next);
+        lastCardObserver.unobserve(lastCard.target);
+        if (document.querySelector(".card:last-child")) {
+          lastCardObserver.observe(document.querySelector(".card:last-child"));
+        }
+      },
+      {
+        rootMargin: "500px" // reason, want to make network request before the next card is visible
+      }
+    );
+
+    if (document.querySelector(".card:last-child")) {
+      lastCardObserver.observe(document.querySelector(".card:last-child"));
+    }
   };
 
   return (
     <div className="pokemonLists">
       {/* <div className="count">Total Pokemons: {count}</div> */}
-      {pokemon.fetching ? (
-        <h1>Loading...</h1>
-      ) : (
-        <div className="lists">
-          {pokemon.content.length > 0 ? (
-            pokemon.content.map((pokemon, index) => {
-              return <PokemonListCard pokemon={pokemon} key={index} />;
-            })
-          ) : (
-            <h1>No Pokemons found</h1>
-          )}
-        </div>
-      )}
-      {/* <div className="loadmore">
-        <button onClick={loadmore}>Load more...</button>
-      </div> */}
-      {/* {previous && (
-        <div className="loadless">
-          <button onClick={loadless}>Load Less...</button>
-        </div>
-      )} */}
+
+      <div className="lists">
+        {pokemon.content.length > 0 ? (
+          pokemon.content.map((pokemon, index) => {
+            return <PokemonListCard pokemon={pokemon} key={index} />;
+          })
+        ) : (
+          <h1>No Pokemons found</h1>
+        )}
+        {pokemon.fetching && <div class="loader">Loading...</div>}
+      </div>
     </div>
   );
 };
