@@ -3,9 +3,9 @@ import PokemonListCard from "./PokemonListCard";
 import { getPokemonsWithNext } from "../js/pokemon";
 import { FETCH_NEW_POKEMON, FETCHING, CONTENT } from "../js/Constant";
 import pokemonReducer from "../js/reducers";
+import Spinner from "./Spinner";
 
 import "../style/pokemon.scss";
-import "../style/loader.scss";
 
 const initialData = {
   fetching: true,
@@ -14,7 +14,8 @@ const initialData = {
     // { name: "Prachi", abilities: ["code", "eat", "sleep"] }
   ],
   offset: 0,
-  next: "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20"
+  next: "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20",
+  contents: []
 };
 
 const PokemonLists = () => {
@@ -99,7 +100,7 @@ const PokemonLists = () => {
         ) : (
           <h1>No Pokemons found</h1>
         )}
-        {pokemon.fetching && <div class="loader">Loading...</div>}
+        {pokemon.fetching && <Spinner />}
       </div>
     </div>
   );
