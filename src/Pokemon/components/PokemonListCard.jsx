@@ -12,14 +12,30 @@ const PokemonListCard = ({ pokemon }) => {
           <img src={pokemon.imgSrc} alt={pokemon.name} />
         </picture>
       </div>
-      <div className="name">{pokemon.name}</div>
+      <hr />
+      <div className="name">
+        <h1>
+          <em>{pokemon.name}</em>
+        </h1>
+      </div>
       <div className="abilities">
         {pokemon.abilities.length > 0 ? (
-          <ol className="abilitiesList">
-            {pokemon.abilities.map((ability, index) => {
-              return <li key={ability + index}>{ability}</li>;
-            })}
-          </ol>
+          <figure>
+            <figcaption>
+              <p>
+                <b>Abilities</b>
+              </p>
+            </figcaption>
+            <ul className="abilitiesList">
+              {pokemon.abilities.map((ability, index) => {
+                return (
+                  <li key={ability + index}>
+                    <em>{ability}</em>
+                  </li>
+                );
+              })}
+            </ul>
+          </figure>
         ) : (
           <strong>No abilities</strong>
         )}

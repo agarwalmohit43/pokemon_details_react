@@ -54,7 +54,7 @@ async function filterResponse(res) {
               abilitiesNames = abilities.map((item) => item.ability.name);
             }
             let obj = {
-              name: curr.name,
+              name: capitalizeFistLetter(curr.name),
               abilities: abilitiesNames,
               imgSrc: curr.sprites.front_shiny || ""
             };
@@ -77,3 +77,7 @@ async function filterResponse(res) {
     throw error;
   }
 }
+
+const capitalizeFistLetter = (word) => {
+  return word.length > 0 && word[0].toUpperCase() + word.slice(1);
+};
