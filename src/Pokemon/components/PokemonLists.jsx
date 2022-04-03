@@ -1,11 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import PokemonListCard from "./PokemonListCard";
 import { getPokemons } from "../js/pokemon";
+import { FETCH_NEW_POKEMON, FETCHING, CONTENT } from "../js/Constant";
+import { pokemonReducer } from "../js/reducers";
+
+const initialData = {
+  fetching: false,
+  content: [],
+  offset: 0
+};
 
 const PokemonLists = () => {
+  const [pokemon, dispatch] = useReducer(pokemonReducer, {});
   const [count, setCount] = useState(0);
   const [next, setNext] = useState(
-    "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20"
+    `https://pokeapi.co/api/v2/pokemon/?offset=${pokemon.offset}&limit=20`
   );
 
   const [previous, setPrevious] = useState("");
