@@ -26,6 +26,7 @@ const initialData = {
 const PokemonLists = () => {
   const [pokemon, dispatch] = useReducer(pokemonReducer, initialData);
   const count = useRef(0);
+  // const offSetMax = useRef(0);
 
   // const fetch = useCallback(() => {
   //   return fetchAndUpdate;
@@ -33,7 +34,9 @@ const PokemonLists = () => {
 
   useEffect(() => {
     // fetchAndUpdate(pokemon.next);
-    fetchAndUpdate(pokemon.offset);
+    if (count.current >= pokemon.offset) {
+      fetchAndUpdate(pokemon.offset);
+    }
   }, [pokemon.offset]);
 
   useEffect(() => {
@@ -72,6 +75,7 @@ const PokemonLists = () => {
             }
           });
           count.current = res.count;
+          // offSetMax.current = parseInt(res.count / 20);
         })
         .catch(console.log);
     }
@@ -97,15 +101,19 @@ const PokemonLists = () => {
     cards.forEach((card) => {
       observer.observe(card);
     });
+    lazyLoading();
+  };
 
+  const lazyLoading = () => {
     //lazy-loading
     const lastCardObserver = new IntersectionObserver(
       (entries) => {
         const lastCard = entries[0];
         if (!lastCard.isIntersecting) return;
-        // fetchAndUpdate(pokemon.next);
-        dispatch({ type: OFFSET_INCREASE });
-        fetchAndUpdate(pokemon.offset);
+        if (count.current >= pokemon.offset) {
+          dispatch({ type: OFFSET_INCREASE });
+        }
+
         lastCardObserver.unobserve(lastCard.target);
         if (document.querySelector(".card:last-child")) {
           lastCardObserver.observe(document.querySelector(".card:last-child"));
@@ -135,6 +143,10 @@ const PokemonLists = () => {
         )}
         {pokemon.fetching && <Spinner />}
       </div>
+      <br />
+      <hr />
+      {/* {pokemon.offset} */}
+      {pokemon.offset >= count.current && <h1>Finish</h1>}
     </div>
   );
 };

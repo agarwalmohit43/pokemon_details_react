@@ -13,7 +13,7 @@ export async function getPokemonsWithNext(next) {
 }
 
 export async function getPokemonsWithPageOffset(offset) {
-  // console.log("called", offset);
+  console.log("called", offset);
   try {
     let params = {
       offset,
