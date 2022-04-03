@@ -93,8 +93,8 @@ const PokemonLists = () => {
         });
       },
       {
-        threshold: 0 // 0 to 100%, 0 means about to enter the screen.
-        // rootMargin: "200px"
+        threshold: 0, // 0 to 100%, 0 means about to enter the screen.
+        rootMargin: "800px"
       }
     );
 
