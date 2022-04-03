@@ -13,14 +13,14 @@ export async function getPokemonsWithNext(next) {
 }
 
 export async function getPokemonsWithPageOffset(offset) {
-  console.log("called", offset);
+  // console.log("called", offset);
   try {
     let params = {
       offset,
       limit: 20
     };
     const res = await pokemon.get("/", { params });
-    console.log(res);
+    // console.log(res);
     const data = await filterResponse(res);
     return data;
   } catch (error) {

@@ -63,7 +63,7 @@ const PokemonLists = () => {
       dispatch({ type: FETCHING });
       getPokemonsWithPageOffset(offset)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           dispatch({
             type: CONTENT,
             payload: {
@@ -89,8 +89,8 @@ const PokemonLists = () => {
         });
       },
       {
-        threshold: 1, // 0 to 100%, 0 means about to enter the screen.
-        rootMargin: "200px"
+        threshold: 0 // 0 to 100%, 0 means about to enter the screen.
+        // rootMargin: "200px"
       }
     );
 
