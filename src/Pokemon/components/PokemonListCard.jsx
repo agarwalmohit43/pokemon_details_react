@@ -1,5 +1,10 @@
 const PokemonListCard = ({ pokemon }) => {
   // console.log(pokemon);
+
+  if (pokemon === undefined || Object.keys(pokemon).length === 0) {
+    return null;
+  }
+
   return (
     <div className="card">
       <div className="icon">

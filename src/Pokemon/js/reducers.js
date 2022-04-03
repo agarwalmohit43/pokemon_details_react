@@ -1,4 +1,9 @@
-import { FETCH_NEW_POKEMON, FETCHING, CONTENT } from "./Constant";
+import {
+  OFFSET_INCREASE,
+  FETCH_NEW_POKEMON,
+  FETCHING,
+  CONTENT
+} from "./Constant";
 
 const pokemonReducer = (state, action) => {
   switch (action.type) {
@@ -12,7 +17,10 @@ const pokemonReducer = (state, action) => {
         content: state.content.concat(action.payload.data),
         fetching: false,
         next: action.payload.next
+        // offset: state.offset + 20
       };
+    case OFFSET_INCREASE:
+      return { ...state, offset: state.offset + 20 };
     default:
       return state;
   }

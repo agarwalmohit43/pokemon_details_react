@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import PokemonListCard from "./PokemonListCard";
-import { getPokemonsWithNext } from "../js/pokemon";
-import { FETCH_NEW_POKEMON, FETCHING, CONTENT } from "../js/Constant";
+import { getPokemonsWithPageOffset } from "../js/pokemon";
+import { FETCHING, CONTENT, OFFSET_INCREASE } from "../js/Constant";
 import pokemonReducer from "../js/reducers";
 import Spinner from "./Spinner";
 
 import "../style/pokemon.scss";
 
 const initialData = {
+  // const [card, setCard] = useState(document.querySelectorAll(".card"));
   fetching: true,
   content: [
-    // { name: "Mohit", abilities: ["code", "eat", "sleep"] },
+    // { name: "Mohit", abilities: ["code", "eat", "sleep"] }
     // { name: "Prachi", abilities: ["code", "eat", "sleep"] }
   ],
   offset: 0,
@@ -18,21 +19,49 @@ const initialData = {
   contents: []
 };
 
+// const cards = useMemo(() => document.querySelectorAll(".card"), [
+//   card
+// ]);
+
 const PokemonLists = () => {
   const [pokemon, dispatch] = useReducer(pokemonReducer, initialData);
+  const count = useRef(0);
+
+  // const fetch = useCallback(() => {
+  //   return fetchAndUpdate;
+  // }, [pokemon.offset]);
 
   useEffect(() => {
-    fetchAndUpdate(pokemon.next);
-  }, [pokemon.next]);
+    // fetchAndUpdate(pokemon.next);
+    fetchAndUpdate(pokemon.offset);
+  }, [pokemon.offset]);
 
   useEffect(() => {
     observeNewCard();
   }, [pokemon.content]);
 
-  const fetchAndUpdate = (next) => {
-    if (next) {
+  // const fetchAndUpdate = (next) => {
+  //   if (next) {
+  //     dispatch({ type: FETCHING });
+  //     getPokemonsWithNext(next)
+  //       .then((res) => {
+  //         console.log(res);
+  //         dispatch({
+  //           type: CONTENT,
+  //           payload: {
+  //             data: res.content,
+  //             next: res.next
+  //           }
+  //         });
+  //       })
+  //       .catch(console.log);
+  //   }
+  // };
+
+  const fetchAndUpdate = (offset) => {
+    if (offset >= 0) {
       dispatch({ type: FETCHING });
-      getPokemonsWithNext(next)
+      getPokemonsWithPageOffset(offset)
         .then((res) => {
           console.log(res);
           dispatch({
@@ -42,6 +71,7 @@ const PokemonLists = () => {
               next: res.next
             }
           });
+          count.current = res.count;
         })
         .catch(console.log);
     }
@@ -52,14 +82,15 @@ const PokemonLists = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        console.log(entries);
+        // console.log(entries);
         entries.forEach((entry) => {
           entry.target.classList.toggle("show", entry.isIntersecting);
           if (entry.isIntersecting) observer.unobserve(entry.target); // once visible stop unmounting
         });
       },
       {
-        threshold: 1 // 0 to 100%, 0 means about to enter the screen.
+        threshold: 1, // 0 to 100%, 0 means about to enter the screen.
+        rootMargin: "200px"
       }
     );
 
@@ -72,7 +103,9 @@ const PokemonLists = () => {
       (entries) => {
         const lastCard = entries[0];
         if (!lastCard.isIntersecting) return;
-        fetchAndUpdate(pokemon.next);
+        // fetchAndUpdate(pokemon.next);
+        dispatch({ type: OFFSET_INCREASE });
+        fetchAndUpdate(pokemon.offset);
         lastCardObserver.unobserve(lastCard.target);
         if (document.querySelector(".card:last-child")) {
           lastCardObserver.observe(document.querySelector(".card:last-child"));
