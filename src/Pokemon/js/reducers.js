@@ -10,7 +10,8 @@ const pokemonReducer = (state, action) => {
       return {
         ...state,
         content: state.content.concat(action.payload.data),
-        fetching: false
+        fetching: false,
+        next: action.payload.next
       };
     default:
       return state;
